@@ -3,7 +3,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.db import IntegrityError
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
+
+
+
+def home(request):
+    return render(request, 'ToDo_app/home.html')
 
 def signup(request):
     if request.method == 'GET':
@@ -16,12 +21,16 @@ def signup(request):
                 login(request, user)
                 return redirect('currentuser')
             except IntegrityError:
-                return render(request,'ToDo_app/signup.html', {'form':UserCreationForm(), 'error': 'You alredy register, please, login.'})    
+                return render(request,'ToDo_app/signup.html', {'form':UserCreationForm(),\
+                    'error': 'You alredy register, please, login.'})    
         else:
-            return render(request,'ToDo_app/signup.html', {'form':UserCreationForm(), 'error': 'Your passwords is not similars, please try again.'})
+            return render(request,'ToDo_app/signup.html', {'form':UserCreationForm(),\
+                'error': 'Your passwords is not similars, please try again.'})
 
-def home(request):
-    return render(request, 'ToDo_app/home.html')
+def logoutuser(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('home')
 
 def currentuser(request):
     return render(request, 'ToDo_app/current_user.html')
