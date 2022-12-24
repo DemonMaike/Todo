@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
+from .forms import TodoForm
+from .models import *
 
 
 
@@ -46,4 +48,18 @@ def logoutuser(request):
         return redirect('home')
     
 def currentuser(request):
-    return render(request, 'ToDo_app/current_user.html')
+    todos = Todo.objects.all().filter(user=request.user, datacopleted=None)
+    return render(request, 'ToDo_app/current_user.html', {'todos': todos})
+
+def createtodo(request):
+    if request.method == "GET":
+        return render(request, 'ToDo_app/createtodo.html', {'form': TodoForm()})
+    else:
+        try:
+            form = TodoForm(request.POST)
+            newtodo = form.save(commit=False)
+            newtodo.user = request.user
+            newtodo.save()
+            return redirect('currentuser')
+        except ValueError:
+            return render(request, 'ToDo_app/createtodo.html', {'form': TodoForm(), 'error': 'Data write is not correct, please try again.'})

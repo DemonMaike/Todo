@@ -2,4 +2,10 @@
 
 {% block content %}
 <h1>Current user</h1>
+
+<ul>
+    {% for todo in todos %}
+    <li>{% if todo.importaned == True%}<b>{% endif %}{{ todo.title }}</li>{% if todo.importaned == True%}</b>{% endif %}
+    {% endfor %}
+</ul>
 {% endblock %}
