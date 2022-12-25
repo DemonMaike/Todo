@@ -5,7 +5,11 @@
 
 <ul>
     {% for todo in todos %}
-    <li>{% if todo.importaned == True%}<b>{% endif %}{{ todo.title }}</li>{% if todo.importaned == True%}</b>{% endif %}
+    <a href="{% url 'todoview' todo.pk %}">
+        <li>
+            {% if todo.importaned == True%}<b>{% endif %}{{ todo.title }}</li>{% if todo.importaned == True%}</b>{% endif %}
+        </li>
+    </a>
     {% endfor %}
 </ul>
 {% endblock %}

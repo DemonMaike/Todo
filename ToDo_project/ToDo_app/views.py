@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
 from .models import *
-
+from django.utils import timezone
 
 
 def home(request):
@@ -60,6 +60,36 @@ def createtodo(request):
             newtodo = form.save(commit=False)
             newtodo.user = request.user
             newtodo.save()
-            return redirect('currentuser')
+            return redirect('currentuser', permanent=True)
         except ValueError:
             return render(request, 'ToDo_app/createtodo.html', {'form': TodoForm(), 'error': 'Data write is not correct, please try again.'})
+
+def todoview(request, todo_id):
+    todo = get_object_or_404(Todo, pk=todo_id, user=request.user)
+    if request.method == 'GET':
+        form = TodoForm(instance=todo)
+        return render(request, 'ToDo_app/viewtodo.html', {'todo': todo, 'form':form})
+    else:
+        try:
+            form = TodoForm(request.POST, instance=todo)
+            form.save()
+            return redirect('currentuser', permanent=True)
+        except ValueError:
+            return render(request, 'ToDo_app/viewtodo.html', {'form': form, 'error': 'Data write is not correct, please try again.'})
+        
+def todocomplite(request, todo_id):
+    todo = get_object_or_404(Todo, pk=todo_id, user=request.user)
+    if request.method == 'POST':
+        todo.datacopleted = timezone.now()
+        todo.save()
+        return redirect('currentuser', permanent=True)
+
+def tododelete(request, todo_id):
+    todo = get_object_or_404(Todo, pk=todo_id, user=request.user)
+    if request.method == 'POST':
+        todo.delete()
+        return redirect('currentuser', permanent=True)
+    
+def todocomplited(request):
+    todos = Todo.objects.filter(datacopleted__isnull=False, user=request.user)
+    return render(request, 'ToDo_app/complited.html', {'todos':todos})

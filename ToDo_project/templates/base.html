@@ -6,6 +6,10 @@ Logged In as {{ user.username }}
 <button type="submit">Logout</button>
 </form>
 
+<a href="{% url 'createtodo' %}">Created</a>
+<a href="{% url 'todocomplited' %}">Complited</a>
+<a href="{% url 'currentuser' %}">Current</a>
+
 {% else %}
 
 <a href="{% url 'signup' %}">Sign Up</a>
